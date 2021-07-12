@@ -18,7 +18,13 @@ def mono_site(rec, samples):
     sumFqList = []
     for sample in samples:
         try:
-            sumFqList .append(sum(rec.samples.get(sample)['GT']))
+            GT = list(rec.samples.get(sample)['GT'])
+            GT = [str(GT[0]), str(GT[1])]
+            if "None" in GT:
+                continue
+            else:
+                GT = GT[0] + GT[1]
+                sumFqList .append(GT)
         except:
             continue
     if len(set(sumFqList)) == 1:
