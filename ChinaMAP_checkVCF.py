@@ -17,13 +17,23 @@ def get_FileSize(filePath):
     fsize = os.path.getsize(filePath)
     fsize = fsize/float(1024*1024)
     if fsize > 100:
-        print()
-    return False
+        logging.info(filePath + ": File size over 100M.")
+        return False
+    else:
+        logging.info(filePath + ": Check file size    OK")
+        return True
 
 def file_format(inFile):
     if inFile.endswith(".vcf.gz"):
-        logging.info(inFile + ": Check vcf.gz format    OK")
-        return  True
+        try:
+            tmpFile = VariantFile(fileName, 'r')
+            tmpFile.close()           
+        except:
+            logging.error(inFile + ": Not implemented in files compressed by bgzip.")
+            return  False
+        else:
+            logging.info(inFile + ": Check vcf.gz format    OK")
+            return  True
     else:
         logging.error(inFile + ": Not in .vcf.gz format.")
         return False
@@ -33,24 +43,24 @@ def chr_format(vcfFile, chrList):
     chr_unique = list(set(chr_list))
     
     if len(chr_unique) == 1:
-        logging.info(vcfFile.filename + ": Check chr spreated    OK")
+        logging.info(vcfFile.filename.decode() + ": Check chr spreated    OK")
     else:
-        logging.error(vcfFile.filename + ": Include more than one chromsome.")
+        logging.error(vcfFile.filename.decode() + ": Include more than one chromsome.")
         return False
 
     if chr_unique[0][:3] == "chr":
-        logging.info(vcfFile.filename + ": Check chr prefix    OK")
+        logging.info(vcfFile.filename.decode() + ": Check chr prefix    OK")
     else:
-        logging.error(vcfFile.filename + ": #CHROM cloumn does not meet the required format(chr + number).")
+        logging.error(vcfFile.filename.decode() + ": #CHROM cloumn does not meet the required format(chr + number).")
         return False
     if int(chr_unique[0][3:]) in [i for i in range(23)]:
        pass
     else:
-        logging.warn(vcfFile.filename+ ": ChinaMAP imputation server only support chr1-22. This file should be excluded.")
+        logging.warn(vcfFile.filename.decode()+ ": ChinaMAP imputation server only support chr1-22. This file should be excluded.")
         return False
         
     if chr_unique[0] in chrList:
-        logging.warn(vcfFile.filename + ": The chromosome already exists in your file list.")
+        logging.warn(vcfFile.filename.decode() + ": The chromosome already exists in your file list.")
     else:
         chrList.append(chr_unique[0])
 
@@ -60,33 +70,32 @@ def position_sort(vcfFile):
     pos_list = [rec.pos for rec in vcfFile.fetch()]
     pos_list_sort = pos_list.sort()
     if pos_list == pos_list_sort:
-        logging.info(vcfFile.filename + ": Check pos sorted    OK")
+        logging.info(vcfFile.filename.decode() + ": Check pos sorted    OK")
     else:
-        logging.error(vcfFile.filename + ": The file is not sorted.")
+        logging.error(vcfFile.filename.decode() + ": The file is not sorted.")
         return False
 
 def ref_hg38(chrLength, vcfFile, chrList):
     try:
         length = vcfFile.header.contigs.get(chrList[-1]).length
     except:
-        logging.warn(vcfFile.filename + ": Please make sure this file is from Hg38.")
+        logging.warn(vcfFile.filename.decode() + ": Please make sure this file is from Hg38.")
         return False
     else:
         if length == chrLength[chrList[-1]]:
-            logging.info(vcfFile.filename + ": Check hg38    OK")
+            logging.info(vcfFile.filename.decode() + ": Check hg38    OK")
             return True
         else:
-            logging.error(vcfFile.filename + ": Chromsome length doesn't match Hg38 reference.")
+            logging.error(vcfFile.filename.decode() + ": Chromsome length doesn't match Hg38 reference.")
             return False
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Check input file for ChinaMAP imputation server.')
+    parser = argparse.ArgumentParser(description='Check input files for ChinaMAP imputation server.')
     parser._action_groups.pop()
     required = parser.add_argument_group('required arguments')
     required.add_argument('-i', '--input', type=str, default = None, required=True, help="Input .vcf.gz files path list.")
     args = parser.parse_args()
     inFileList = args.input
-    logFile = args.output
     
     LOG_FORMAT = "%(asctime)s - %(levelname)s - %(message)s"
     logging.basicConfig(filename='ChinaMAP_checkVCF.log', level=logging.DEBUG, format=LOG_FORMAT)
@@ -121,3 +130,5 @@ if __name__ == "__main__":
 
         if ref_hg38(chrLength, vcfFile, chrList):
             pass
+    
+        vcfFile.close()
