@@ -53,7 +53,7 @@ python3 ChinaMAP_filterVCF.py -i [your_input_files_path.list] -d [output dir nam
 
 Please use at least one of -r or -e
 
-### Output
+### Result
 
 * *_filtered.vcf.gz: Filtered ChinaMAP imputation server input files.
 * *_exclude.vcf.gz: All sites that are not in ChinaMAP reference panel.
