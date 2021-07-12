@@ -47,7 +47,7 @@ python3 ChinaMAP_filterVCF.py -i [your_input_files_path.list] -d [output dir nam
 
 ```bash
 python3 ChinaMAP_filterVCF.py -i [your_input_files_path.list] -d [output dir name] -r [path of mbiobank_ChinaMAP_phase1_v1_reference_panel.sites.vcf.gz] -e
-```bash
+```
 
 #### Notice
 
