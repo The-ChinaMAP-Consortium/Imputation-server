@@ -13,7 +13,7 @@ ChinaMAP_checkVCF.py is a tool written in Python to check input VCF files before
 #### Recommend
 
 ```bash
-python3 ChinaMAP_checkVCF.py -i -i chr2.vcf.gz chr3.vcf.gz -r mbiobank_ChinaMAP_phase1_v1_reference_panel.sites.vcf.gz
+python3 ChinaMAP_checkVCF.py -i chr2.vcf.gz chr3.vcf.gz -r mbiobank_ChinaMAP_phase1_v1_reference_panel.sites.vcf.gz
 ```
 #### If you don't want to check the sites percentage that are not in ChinaMAP reference panel
 
