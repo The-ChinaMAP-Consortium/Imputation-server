@@ -31,7 +31,7 @@ ChinaMAP_filterVCF.py is a tool written in Python to filter input VCF files befo
 
 ### Example
 
-#### If you want to remove sites that not in ChinMAP reference panel
+#### If you want to remove sites that are not in ChinMAP reference panel
 
 ```bash
 python3 ChinaMAP_filterVCF.py -i [your_input_files_path.list] -d [output dir name] -r [path of mbiobank_ChinaMAP_phase1_v1_reference_panel.sites.vcf.gz]
