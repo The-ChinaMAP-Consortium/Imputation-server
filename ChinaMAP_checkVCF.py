@@ -38,12 +38,32 @@ def file_format(inFile):
         logging.error(inFile + ": Not in .vcf.gz format.")
         return False
 
+def out_site(rec, panelVcfFile):
+    chrName = rec.chrom
+    pos = rec.pos
+    ref = rec.ref
+    alts = list(rec.alts)
+    if len(alts) > 1:
+        return False
+    getAlts = []
+    for rec2 in panelVcfFile.fetch(chrName, pos-1, pos):   
+        getPos =  rec2.pos
+        getRef = rec2.ref
+        getAlts += list(rec2.alts)
+    try:
+        if  (pos == getPos) and (ref == getRef) and (alts[0] in getAlts):
+            return True
+        else:
+            return False
+    except:
+        return False
+
 def chr_format(vcfFile, chrList):
     chr_list = [rec.chrom for rec in vcfFile.fetch()]
     chr_unique = list(set(chr_list))
     
     if len(chr_unique) == 1:
-        logging.info(vcfFile.filename.decode() + ": Check chr spreated    OK")
+        logging.info(vcfFile.filename.decode() + ": Check chr splited    OK")
     else:
         logging.error(vcfFile.filename.decode() + ": Include more than one chromsome.")
         return False
@@ -93,7 +113,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Check input files for ChinaMAP imputation server.')
     parser._action_groups.pop()
     required = parser.add_argument_group('required arguments')
-    required.add_argument('-i', '--input', type=str, default = None, required=True, help="Input .vcf.gz files path list.")
+    optional = parser.add_argument_group('optional arguments')
+    required.add_argument('-i', '--input', type=str, default = None, required=True, nargs = '+', help="Input .vcf.gz files.")
+    optional.add_argument('-r', '--reference', type=str, default = None, help="ChinaMAP reference panel .vcf.gz file with index file.")
     args = parser.parse_args()
     inFileList = args.input
     
@@ -102,25 +124,20 @@ if __name__ == "__main__":
 
     chrLength={"chr1": 248956422, "chr2": 242193529, "chr3": 198295559, "chr4": 190214555, "chr5": 181538259, "chr6": 170805979, "chr7": 159345973, "chr8": 145138636, "chr9": 138394717, "chr10": 133797422, "chr11": 135086622, "chr12": 133275309, "chr13": 114364328, "chr14": 107043718 ,"chr15": 101991189, "chr16": 90338345, "chr17": 83257441, "chr18": 80373285, "chr19": 58617616, "chr20": 64444167, "chr21": 46709983, "chr22": 50818468}
 
-    fileList = []
-    with open(inFileList, "r") as f:
-        for line in f.readlines():
-            fileList.append(line.strip('\n'))
-    
-    for fileName in fileList:
+    for fileName in inFileList:
         if get_FileSize(fileName):
             pass
         else:
-            fileList.remove(fileName)
+            inFileList.remove(fileName)
 
         if file_format(fileName):
             pass
         else:
-            fileList.remove(fileName)
+            inFileList.remove(fileName)
     
     chrList = []
 
-    for fileName in fileList:
+    for fileName in inFileList:
         vcfFile = VariantFile(fileName, 'r')
         tmpChrList = chr_format(vcfFile, chrList)
         if tmpChrList:
@@ -130,5 +147,21 @@ if __name__ == "__main__":
 
         if ref_hg38(chrLength, vcfFile, chrList):
             pass
-    
+        if args.reference:
+            panelFile = args.reference
+            panelVcfFile = VariantFile(panelFile, 'r')
+            for rec in vcfFile.fetch():
+                allNumber = 0
+                outNumber = 0
+                if out_site(rec, panelVcfFile):
+                    allNumber += 1
+                else:
+                    outNumber +=1
+                    allNumber += 1
+            if (outNumber / allNumber) > 0.2:
+                logging.error(fileName + ": Out sites precentage more than 20 percent. Please run ChinaMAP_filter.py with -r.")
+            else:
+                logging.info(fileName + ": Check out sites percentage    OK")
+        else:
+            logging.warn(fileName + ": Not running Check out sites percentage")
         vcfFile.close()

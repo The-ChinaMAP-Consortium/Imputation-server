@@ -77,9 +77,9 @@ if __name__ == "__main__":
     parser._action_groups.pop()
     required = parser.add_argument_group('required arguments')
     optional = parser.add_argument_group('optional arguments')
-    required.add_argument('-i', '--input', type=str, default = None, required=True, help="Input .vcf.gz files path list.")
+    required.add_argument('-i', '--input', type=str, default = None, required=True, nargs='+', help="Input .vcf.gz files.")
     required.add_argument('-d', '--outputDir', type=str, default = None, required=True, help="Output dictionary.")
-    optional.add_argument('-r', '--reference', type=str, default = None, help="ChinaMAP reference panel .vcf.gz file.")
+    optional.add_argument('-r', '--reference', type=str, default = None, help="ChinaMAP reference panel .vcf.gz file with index file.")
     optional.add_argument('-e', '--exclude_monomorphic',  action='store_true', help="Exclude monomorphic sites.")
     args = parser.parse_args()
     inFileList = args.input
@@ -91,13 +91,8 @@ if __name__ == "__main__":
     
     if not os.path.exists(outDir):
         os.makedirs(outDir)
-
-    fileList = []
-    with open(inFileList, "r") as f:
-        for line in f.readlines():
-            fileList.append(line.strip('\n'))
     
-    for fileName in fileList:
+    for fileName in inFileList:
         if fileName.endswith(".vcf.gz"):
             try:
                 tmpFile = VariantFile(fileName, 'r')
