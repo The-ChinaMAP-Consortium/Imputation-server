@@ -26,8 +26,8 @@ python3 ChinaMAP_checkVCF.py -i chr2.vcf.gz chr3.vcf.gz
 
 ### Notice
 
-The mbiobank_ChinaMAP_phase1_v1_reference_panel.sites.vcf.gz file must have a index file. 
-If the check fails, please refer go to http://www.mbiobank.com/imputation/help/ for solution
+* The mbiobank_ChinaMAP_phase1_v1_reference_panel.sites.vcf.gz file must have a index file. 
+* If the check fails, please refer go to http://www.mbiobank.com/imputation/help/ for solution.
 
 ## ChinaMAP_filterVCF.py
 ChinaMAP_filterVCF.py is a tool written in Python to filter input VCF files before submitting tasks to ChinaMAP imputation server . It removes monomorphic sites and sites that are not in ChinaMAP reference panel from your input files.
@@ -60,8 +60,8 @@ python3 ChinaMAP_filterVCF.py -i chr2.vcf.gz chr3.vcf.gz -d ./output/ -r mbioban
 
 #### Notice
 
-The mbiobank_ChinaMAP_phase1_v1_reference_panel.sites.vcf.gz file must have a index file.
-Please use at least one of -r or -e parameters.
+* The mbiobank_ChinaMAP_phase1_v1_reference_panel.sites.vcf.gz file must have a index file.
+* Please use at least one of -r or -e parameters.
 
 ### Result
 
