@@ -158,8 +158,8 @@ if __name__ == "__main__":
                 else:
                     outNumber +=1
                     allNumber += 1
-            if (outNumber / allNumber) > 0.2:
-                logging.error(fileName + ": Out sites precentage more than 20 percent. Please run ChinaMAP_filter.py with -r.")
+            if (outNumber / allNumber) > 0.5:
+                logging.error(fileName + ": Out sites precentage more than 50 percent. Please run ChinaMAP_filter.py with -r.")
             else:
                 logging.info(fileName + ": Check out sites percentage    OK")
         else:
